@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "robotframework-project"
+version = "0.1.0"
+description = "A project to use Robot Framework with Poetry"
+authors = ["pacific.prashantdubey@gmail.com"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"  # Allow any Python version
+robotframework = "^7.1.1"  # Install any version
+robotframework-browser = "*"
+robotframework-requests = "*"
+robotframework-jsonlibrary = "*"
+robotframework-databaselibrary = "*"
+robotframework-mongodb-library = "*"
+pymongo = "*"
+robotframework-mongodb-bson-library = "*"
+pymysql = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+#[tool.poetry.scripts]
+#robot = "robot:run_cli"
