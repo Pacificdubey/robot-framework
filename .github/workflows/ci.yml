@@ -44,10 +44,9 @@ jobs:
       with:
         script: |
           const fs = require('fs');
-          const path = 'output.xml';
           const xml2js = require('xml2js');
           const parser = new xml2js.Parser();
-          const xml = fs.readFileSync(path, 'utf8');
+          const xml = fs.readFileSync('output.xml', 'utf8');
           parser.parseString(xml, (err, result) => {
             if (err) {
               core.setFailed(`Failed to parse XML: ${err.message}`);
@@ -62,5 +61,5 @@ jobs:
               - **Passed Tests**: ${passedTests}
               - **Failed Tests**: ${failedTests}
             `;
-            core.summary.addRaw(summary).write();
+            fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
           });
