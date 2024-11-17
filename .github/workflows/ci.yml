@@ -51,4 +51,6 @@ jobs:
     - name: Generate GitHub Summary
       run: |
         poetry run robot --listener GHAReports .
+      env:
+        TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
 
