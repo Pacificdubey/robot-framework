@@ -44,7 +44,7 @@ jobs:
       with:
         script: |
           const fs = require('fs');
-          const path = 'apitesting/output.xml';
+          const path = 'output.xml';
           const xml2js = require('xml2js');
           const parser = new xml2js.Parser();
           const xml = fs.readFileSync(path, 'utf8');
