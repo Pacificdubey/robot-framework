@@ -50,5 +50,5 @@ jobs:
 
     - name: Generate GitHub Summary
       run: |
-        poetry run robotframework-ghareports --output output.xml --gha-summary $GITHUB_STEP_SUMMARY
+        poetry run robot --listener GHAReports .
 
