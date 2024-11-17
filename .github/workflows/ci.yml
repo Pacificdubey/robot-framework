@@ -48,38 +48,7 @@ jobs:
           log.html
           report.html
 
-    - name: Publish summary
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const fs = require('fs');
-          const xml2js = require('xml2js');
-          const parser = new xml2js.Parser();
-          const xml = fs.readFileSync('output.xml', 'utf8');
-          parser.parseString(xml, (err, result) => {
-            if (err) {
-              core.setFailed(`Failed to parse XML: ${err.message}`);
-              return;
-            }
-            const statistics = result.robot.statistics[0];
-            const totalTests = statistics.total ? statistics.total[0].$.total : 'N/A';
-            const passedTests = statistics.total ? statistics.total[0].$.pass : 'N/A';
-            const failedTests = statistics.total ? statistics.total[0].$.fail : 'N/A';
-            const testCases = result.robot.suite[0].test.map(test => {
-              const name = test.$.name;
-              const status = test.status[0].$.status;
-              const elapsed = test.status[0].$.elapsed;
-              return `- **${name}**: ${status} (Elapsed: ${elapsed} seconds)`;
-            }).join('\n');
-            const summary = `
-              ## Robot Framework Test Summary
-              - **Total Tests**: ${totalTests}
-              - **Passed Tests**: ${passedTests}
-              - **Failed Tests**: ${failedTests}
-              ### Test Cases
-              ${testCases}
-              ### Detailed Reports
-              You can download the detailed reports from the 'Artifacts' section below.
-            `;
-            fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
-          });
+    - name: Generate GitHub Summary
+      run: |
+        poetry run robotframework-ghareports --output output.xml --gha-summary $GITHUB_STEP_SUMMARY
+
