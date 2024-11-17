@@ -52,9 +52,10 @@ jobs:
               core.setFailed(`Failed to parse XML: ${err.message}`);
               return;
             }
-            const totalTests = result.robot.statistics[0].total[0].$.total;
-            const passedTests = result.robot.statistics[0].total[0].$.pass;
-            const failedTests = result.robot.statistics[0].total[0].$.fail;
+            const statistics = result.robot.statistics[0];
+            const totalTests = statistics.total ? statistics.total[0].$.total : 'N/A';
+            const passedTests = statistics.total ? statistics.total[0].$.pass : 'N/A';
+            const failedTests = statistics.total ? statistics.total[0].$.fail : 'N/A';
             const summary = `
               ## Robot Framework Test Summary
               - **Total Tests**: ${totalTests}
