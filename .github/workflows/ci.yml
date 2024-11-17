@@ -40,7 +40,7 @@ jobs:
         TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
     
     - name: Upload Robot Framework output
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: robot-framework-output
         path: |
