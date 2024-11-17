@@ -49,11 +49,23 @@ jobs:
           report.html
 
     - name: Publish summary
-      run: |
-        echo "## Robot Framework Test Summary" >> $GITHUB_STEP_SUMMARY
-        echo "- **Total Tests**: $(grep -oP '(?<=total=")\d+' output.xml)" >> $GITHUB_STEP_SUMMARY
-        echo "- **Passed Tests**: $(grep -oP '(?<=pass=")\d+' output.xml)" >> $GITHUB_STEP_SUMMARY
-        echo "- **Failed Tests**: $(grep -oP '(?<=fail=")\d+' output.xml)" >> $GITHUB_STEP_SUMMARY
-        echo "### Detailed Reports" >> $GITHUB_STEP_SUMMARY
-        echo "[View Report](./artifacts/robot-framework-output/report.html)" >> $GITHUB_STEP_SUMMARY
-        echo "[View Log](./artifacts/robot-framework-output/log.html)" >> $GITHUB_STEP_SUMMARY
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const xml2js = require('xml2js');
+          const parser = new xml2js.Parser();
+          const xml = fs.readFileSync('output.xml', 'utf8');
+          parser.parseString(xml, (err, result) => {
+            if (err) {
+              core.setFailed(`Failed to parse XML: ${err.message}`);
+              return;
+            }
+            const statistics = result.robot.statistics[0];
+            const totalTests = statistics.total ? statistics.total[0].$.total : 'N/A';
+            const passedTests = statistics.total ? statistics.total[0].$.pass : 'N/A';
+            const failedTests = statistics.total ? statistics.total[0].$.fail : 'N/A';
+            const testCases = result.robot.suite[0].test.map(test => {
+              const name = test.$.name;
+              const status = test.status[0].$.status;
+              const elapsed = test.status[0].$.elapsed;
