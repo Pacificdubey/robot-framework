@@ -21,8 +21,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - name: Install dependencies
-      run: npm install xml2js
 
     - name: Install Poetry
       run: |
@@ -33,24 +31,30 @@ jobs:
       run: |
         poetry install
 
-    - name: Run Robot Framework tests
+    #- name: Run Robot Framework tests
+     # run: |
+      #  poetry run robot --variable EXECUTION_ID:${{ github.event.inputs.EXECUTION_ID }} apitesting/
+      #env:
+      #  TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
+
+    - name: Generate GitHub Summary
       run: |
-        poetry run robot --variable EXECUTION_ID:${{ github.event.inputs.EXECUTION_ID }} apitesting/
+        poetry run robot --listener GHAReports \
+        --variable EXECUTION_ID:${{ github.event.inputs.EXECUTION_ID }} \
+        --outputdir report \
+        apitesting/
       env:
         TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
-    
+
     - name: Upload Robot Framework output
       uses: actions/upload-artifact@v4
       with:
         name: robot-framework-output
-        path: |
-          output.xml
-          log.html
-          report.html
+        path: report
 
-    - name: Generate GitHub Summary
-      run: |
-        poetry run robot --listener GHAReports --variable EXECUTION_ID:${{ github.event.inputs.EXECUTION_ID }} apitesting/
-      env:
-        TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
+
+
+
+
+        
 
