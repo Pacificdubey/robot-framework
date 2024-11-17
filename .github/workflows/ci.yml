@@ -40,27 +40,13 @@ jobs:
         TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
     
     - name: Publish summary
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const fs = require('fs');
-          const xml2js = require('xml2js');
-          const parser = new xml2js.Parser();
-          const xml = fs.readFileSync('output.xml', 'utf8');
-          parser.parseString(xml, (err, result) => {
-            if (err) {
-              core.setFailed(`Failed to parse XML: ${err.message}`);
-              return;
-            }
-            const statistics = result.robot.statistics[0];
-            const totalTests = statistics.total ? statistics.total[0].$.total : 'N/A';
-            const passedTests = statistics.total ? statistics.total[0].$.pass : 'N/A';
-            const failedTests = statistics.total ? statistics.total[0].$.fail : 'N/A';
-            const summary = `
-              ## Robot Framework Test Summary
-              - **Total Tests**: ${totalTests}
-              - **Passed Tests**: ${passedTests}
-              - **Failed Tests**: ${failedTests}
-            `;
-            fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
-          });
+      run: |
+        echo "## Robot Framework Test Summary" >> $GITHUB_STEP_SUMMARY
+        echo "### Report" >> $GITHUB_STEP_SUMMARY
+        echo '<details><summary>Click to expand</summary>' >> $GITHUB_STEP_SUMMARY
+        cat report.html >> $GITHUB_STEP_SUMMARY
+        echo '</details>' >> $GITHUB_STEP_SUMMARY
+        echo "### Log" >> $GITHUB_STEP_SUMMARY
+        echo '<details><summary>Click to expand</summary>' >> $GITHUB_STEP_SUMMARY
+        cat log.html >> $GITHUB_STEP_SUMMARY
+        echo '</details>' >> $GITHUB_STEP_SUMMARY
