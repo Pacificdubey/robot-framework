@@ -2,12 +2,6 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       EXECUTION_ID:
@@ -42,3 +36,29 @@ jobs:
         poetry run robot --variable EXECUTION_ID:${{ github.event.inputs.EXECUTION_ID }} apitesting/
       env:
         TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
+    
+    - name: Publish summary
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const path = 'apitesting/output.xml';
+          const xml2js = require('xml2js');
+          const parser = new xml2js.Parser();
+          const xml = fs.readFileSync(path, 'utf8');
+          parser.parseString(xml, (err, result) => {
+            if (err) {
+              core.setFailed(`Failed to parse XML: ${err.message}`);
+              return;
+            }
+            const totalTests = result.robot.statistics[0].total[0].$.total;
+            const passedTests = result.robot.statistics[0].total[0].$.pass;
+            const failedTests = result.robot.statistics[0].total[0].$.fail;
+            const summary = `
+              ## Robot Framework Test Summary
+              - **Total Tests**: ${totalTests}
+              - **Passed Tests**: ${passedTests}
+              - **Failed Tests**: ${failedTests}
+            `;
+            core.summary.addRaw(summary).write();
+          });
