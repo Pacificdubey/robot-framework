@@ -1,0 +1,44 @@
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      EXECUTION_ID:
+        description: 'Execution ID'
+        required: true
+        default: 'a59ae4d9-7313-47f1-9a02-cc7b9d3c00ee'
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        export PATH="$HOME/.local/bin:$PATH"
+
+    - name: Install dependencies
+      run: |
+        poetry install
+
+    - name: Run Robot Framework tests
+      run: |
+        poetry run robot --variable EXECUTION_ID:${{ github.event.inputs.EXECUTION_ID }} apitesting/
+      env:
+        TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
