@@ -39,14 +39,21 @@ jobs:
       env:
         TALEND_API_TOKEN: ${{ secrets.TALEND_API_TOKEN }}
     
+    - name: Upload Robot Framework output
+      uses: actions/upload-artifact@v2
+      with:
+        name: robot-framework-output
+        path: |
+          output.xml
+          log.html
+          report.html
+
     - name: Publish summary
       run: |
         echo "## Robot Framework Test Summary" >> $GITHUB_STEP_SUMMARY
-        echo "### Report" >> $GITHUB_STEP_SUMMARY
-        echo '<details><summary>Click to expand</summary>' >> $GITHUB_STEP_SUMMARY
-        cat report.html >> $GITHUB_STEP_SUMMARY
-        echo '</details>' >> $GITHUB_STEP_SUMMARY
-        echo "### Log" >> $GITHUB_STEP_SUMMARY
-        echo '<details><summary>Click to expand</summary>' >> $GITHUB_STEP_SUMMARY
-        cat log.html >> $GITHUB_STEP_SUMMARY
-        echo '</details>' >> $GITHUB_STEP_SUMMARY
+        echo "- **Total Tests**: $(grep -oP '(?<=total=")\d+' output.xml)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Passed Tests**: $(grep -oP '(?<=pass=")\d+' output.xml)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Failed Tests**: $(grep -oP '(?<=fail=")\d+' output.xml)" >> $GITHUB_STEP_SUMMARY
+        echo "### Detailed Reports" >> $GITHUB_STEP_SUMMARY
+        echo "[View Report](./artifacts/robot-framework-output/report.html)" >> $GITHUB_STEP_SUMMARY
+        echo "[View Log](./artifacts/robot-framework-output/log.html)" >> $GITHUB_STEP_SUMMARY
